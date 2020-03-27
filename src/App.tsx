@@ -6,20 +6,24 @@ import Button from "@material-ui/core/Button";
 import * as math from "mathjs";
 
 function App() {
-  const [mesurables, setMesurables] = useState<Array<[string, number]>>([]);
+  const [mesurables, setMesurables] = useState<Array<[string, number, number]>>(
+    []
+  );
   const [nameValid, setNameValid] = useState<Boolean>(true);
   const [valValid, setValValid] = useState<Boolean>(true);
+  const [deltaValid, setDeltaValid] = useState<Boolean>(true);
   const [nameInput, setNameInput] = useState<string>("x");
-  const [valInput, setValInput] = useState<number>(0.01);
+  const [valInput, setValInput] = useState<number>(0);
+  const [deltaInput, setDeltaInput] = useState<number>(0.01);
   const [funcValid, setFuncValid] = useState<Boolean>(true);
   const [funcInput, setFuncInput] = useState<math.MathNode | undefined>(
     math.parse("x^2")
   );
   const [uncertFunc, setUncertFunc] = useState<math.MathNode | undefined>();
 
-  const mesurablesToObj = (mes: Array<[string, number]>): any => {
+  const mesurablesToObj = (mes: Array<[string, number, number]>): any => {
     let obj: any = {};
-    mes.forEach(([name, value]) => {
+    mes.forEach(([name, _, value]) => {
       obj[name] = value;
     });
     return obj;
@@ -27,13 +31,22 @@ function App() {
 
   const handleValidateName = (event: any) => {
     let conflict = mesurables.find(
-      ([name, val]) => name === event.currentTarget.value
+      ([name]) => name === event.currentTarget.value
     );
     if (event.currentTarget.value.length === 1 && !conflict) {
       setNameValid(true);
       setNameInput(event.currentTarget.value);
     } else {
       setNameValid(false);
+    }
+  };
+  const handleValidateDelta = (event: any) => {
+    let val = Number.parseFloat(event.currentTarget.value);
+    if (!Number.isNaN(val)) {
+      setDeltaValid(true);
+      setDeltaInput(val);
+    } else {
+      setDeltaValid(false);
     }
   };
   const handleValidateVal = (event: any) => {
@@ -46,9 +59,9 @@ function App() {
     }
   };
   const handleAddVar = (event: any) => {
-    let conflict = mesurables.find(([name, val]) => name === nameInput);
-    if (valValid && nameValid && !conflict) {
-      setMesurables([...mesurables, [nameInput, valInput]]);
+    let conflict = mesurables.find(([name]) => name === nameInput);
+    if (valValid && nameValid && deltaValid && !conflict) {
+      setMesurables([...mesurables, [nameInput, deltaInput, valInput]]);
       setNameValid(false);
     }
   };
@@ -74,12 +87,16 @@ function App() {
         setUncertFunc(math.parse("0"));
       } else if (mesurables.length <= 1) {
         let sym = mesurables[0][0];
-        let partial = math.derivative(funcInput, sym);
+        let partial = math.parse(
+          `${mesurables[0][1]} * ${math.derivative(funcInput, sym).toString()}`
+        );
         setUncertFunc(partial);
       } else {
-        let syms = mesurables.map(mes => mes[0]);
-        let partials = syms
-          .map(sym => `(${math.derivative(funcInput, sym).toString()})^2`)
+        let partials = mesurables
+          .map(
+            ([sym, uncert]) =>
+              `(${uncert} * ${math.derivative(funcInput, sym).toString()})^2`
+          )
           .join(" + ");
         setUncertFunc(math.parse(`sqrt(${partials})`));
       }
@@ -96,7 +113,7 @@ function App() {
         <TextField
           error={nameValid ? false : true}
           id="standard-basic"
-          label="Var Symbol"
+          label="Variable Symbol"
           defaultValue="x"
           style={{ marginRight: "10px" }}
           onChange={handleValidateName}
@@ -104,12 +121,20 @@ function App() {
         <TextField
           error={valValid ? false : true}
           id="standard-basic"
-          label={<>Var &Delta;</>}
-          defaultValue="0.01"
+          label="Variable Value"
+          defaultValue="0"
+          style={{ marginRight: "10px" }}
           onChange={handleValidateVal}
         />
+        <TextField
+          error={deltaValid ? false : true}
+          id="standard-basic"
+          label={<>Variable &delta;</>}
+          defaultValue="0.01"
+          onChange={handleValidateDelta}
+        />
         <Button variant="contained" color="primary" onClick={handleAddVar}>
-          Add Var
+          Add Variable
         </Button>
         <br />
         <br />
@@ -120,11 +145,15 @@ function App() {
             flexWrap: "wrap"
           }}
         >
-          {mesurables.map(([varName, varUncertainty], index) => (
+          {mesurables.map(([varName, varUncertainty, varValue], index) => (
             <Chip
               key={index}
               color="primary"
-              label={<>&Delta; = {varUncertainty}</>}
+              label={
+                <>
+                  value = {varValue}; &delta; = {varUncertainty}
+                </>
+              }
               onDelete={handleDelete(index)}
               avatar={<Avatar>{varName}</Avatar>}
               style={{ marginRight: "2px" }}
@@ -160,9 +189,16 @@ function App() {
           {uncertFunc.toString()}
         </h3>
       ) : null}
+      {uncertFunc && funcInput ? (
+        <h3>Value: {funcInput.evaluate(mesurablesToObj(mesurables))}</h3>
+      ) : null}
       {uncertFunc ? (
+        <h3>Uncertainty: {uncertFunc.evaluate(mesurablesToObj(mesurables))}</h3>
+      ) : null}
+      {uncertFunc && funcInput ? (
         <h3>
-          Uncertainty Value: {uncertFunc.evaluate(mesurablesToObj(mesurables))}
+          Result: {funcInput.evaluate(mesurablesToObj(mesurables))}&plusmn;
+          {uncertFunc.evaluate(mesurablesToObj(mesurables))}
         </h3>
       ) : null}
     </div>
