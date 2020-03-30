@@ -66,6 +66,7 @@ function App() {
     }
   };
   const handleDelete = (key: number) => (event: any) => {
+    setUncertFunc(undefined);
     setMesurables(mesurables.filter((_, index) => index !== key));
   };
 
@@ -104,6 +105,19 @@ function App() {
       setUncertFunc(undefined);
     }
   };
+
+  let funcResult;
+  let uncertResult;
+  try {
+    funcResult = funcInput?.evaluate(mesurablesToObj(mesurables));
+  } catch {
+    funcResult = "Error";
+  }
+  try {
+    uncertResult = uncertFunc?.evaluate(mesurablesToObj(mesurables));
+  } catch {
+    uncertResult = "Error";
+  }
   return (
     <div className="App">
       <h1>Mesurable Uncertainty Calculator</h1>
@@ -189,16 +203,12 @@ function App() {
           {uncertFunc.toString()}
         </h3>
       ) : null}
-      {uncertFunc && funcInput ? (
-        <h3>Value: {funcInput.evaluate(mesurablesToObj(mesurables))}</h3>
-      ) : null}
-      {uncertFunc ? (
-        <h3>Uncertainty: {uncertFunc.evaluate(mesurablesToObj(mesurables))}</h3>
-      ) : null}
+      {uncertFunc && funcInput ? <h3>Value: {funcResult}</h3> : null}
+      {uncertFunc ? <h3>Uncertainty: {uncertResult}</h3> : null}
       {uncertFunc && funcInput ? (
         <h3>
-          Result: {funcInput.evaluate(mesurablesToObj(mesurables))}&plusmn;
-          {uncertFunc.evaluate(mesurablesToObj(mesurables))}
+          Result: {funcResult}&plusmn;
+          {uncertResult}
         </h3>
       ) : null}
     </div>
