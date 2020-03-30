@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/Scientific-Uncertainty-Calculator/precache-manifest.c72cd81c5b56aff44ef38dca121fe25b.js"
+  "/Scientific-Uncertainty-Calculator/precache-manifest.eb90d9567ba0693d769593029829710b.js"
 );
 
 self.addEventListener('message', (event) => {

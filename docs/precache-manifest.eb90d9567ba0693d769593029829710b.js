@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "92ad88d9de950aec52f64e5904c30e3c",
+    "revision": "65d86ce67faf9ab0e128c70c07d1bda4",
     "url": "/Scientific-Uncertainty-Calculator/index.html"
   },
   {
-    "revision": "35b16debc80a9264a008",
+    "revision": "0a72c755112c539eb651",
     "url": "/Scientific-Uncertainty-Calculator/static/css/main.ddf17775.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Scientific-Uncertainty-Calculator/static/js/2.3c444492.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "35b16debc80a9264a008",
-    "url": "/Scientific-Uncertainty-Calculator/static/js/main.1cf35b57.chunk.js"
+    "revision": "0a72c755112c539eb651",
+    "url": "/Scientific-Uncertainty-Calculator/static/js/main.5eab28f4.chunk.js"
   },
   {
     "revision": "218a3f647fee8e77d607",
