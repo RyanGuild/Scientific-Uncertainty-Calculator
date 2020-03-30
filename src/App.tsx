@@ -89,14 +89,16 @@ function App() {
       } else if (mesurables.length <= 1) {
         let sym = mesurables[0][0];
         let partial = math.parse(
-          `${mesurables[0][1]} * ${math.derivative(funcInput, sym).toString()}`
+          `${mesurables[0][1]} * (${math
+            .derivative(funcInput, sym)
+            .toString()})`
         );
         setUncertFunc(partial);
       } else {
         let partials = mesurables
           .map(
             ([sym, uncert]) =>
-              `(${uncert} * ${math.derivative(funcInput, sym).toString()})^2`
+              `(${uncert} * (${math.derivative(funcInput, sym).toString()}))^2`
           )
           .join(" + ");
         setUncertFunc(math.parse(`sqrt(${partials})`));
